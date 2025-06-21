@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gemini AI Image Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f0f2f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .container {
+      max-width: 900px;
+    }
+
+    .form-card {
+      border-radius: 20px;
+      background: white;
+      padding: 30px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
+
+    .generate-btn {
+      font-size: 1.1rem;
+      padding: 10px;
+      border-radius: 12px;
+    }
+
+    .image-card {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+
+    .image-card:hover {
+      transform: scale(1.03);
+    }
+
+    .loader {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <h1 class="text-center mb-4 fw-bold">🎨 Gemini AI Image Generator</h1>
+
+    <div class="form-card mx-auto">
+      <label for="prompt" class="form-label fw-semibold">Enter Image Prompt</label>
+      <input type="text" class="form-control mb-3" id="prompt" placeholder="e.g. A futuristic flying car over a cyberpunk city">
+
+      <button class="btn btn-primary w-100 generate-btn" onclick="generateImage()">Generate</button>
+      <div class="text-center mt-3">
+        <div id="loader" class="spinner-border text-primary loader" role="status"></div>
+      </div>
+    </div>
+
+    <div class="mt-5" id="result">
+      <h3 class="text-center mb-4">🖼️ Generated Images</h3>
+      <div class="row g-4" id="image-gallery"></div>
+    </div>
+  </div>
+
+  <script>
+    async function generateImage() {
+      const prompt = document.getElementById("prompt").value.trim();
+      if (!prompt) {
+        alert("Please enter a prompt.");
+        return;
+      }
+
+      document.getElementById("loader").style.display = "inline-block";
+      document.getElementById("image-gallery").innerHTML = "";
+
+      try {
+        const res = await fetch('/generate-image', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ prompt })
+        });
+
+        const data = await res.json();
+        const gallery = document.getElementById("image-gallery");
+
+        data.images.forEach(path => {
+        const col = document.createElement("div");
+        col.className = "col-md-4 image-card";
+
+        const card = document.createElement("div");
+        card.className = "card shadow-sm p-2";
+
+        const img = document.createElement("img");
+        img.src = path;
+        img.className = "card-img-top mb-2";
+        img.alt = "Generated Image";
+
+        // Download Button
+        const downloadBtn = document.createElement("a");
+        downloadBtn.href = path;
+        downloadBtn.download = "";
+        downloadBtn.className = "btn btn-outline-primary w-100";
+        downloadBtn.textContent = "⬇ Download Image";
+
+        // Display URL text
+        const urlText = document.createElement("p");
+        urlText.className = "text-break small text-center mt-2";
+        urlText.innerHTML = `<a href="${path}" target="_blank">${path}</a>`;
+
+        card.appendChild(img);
+        card.appendChild(downloadBtn);
+        card.appendChild(urlText);
+        col.appendChild(card);
+        gallery.appendChild(col);
+      });
+      } catch (error) {
+        console.error(error);
+        alert("❌ An error occurred while generating the image.");
+      } finally {
+        document.getElementById("loader").style.display = "none";
+      }
+    }
+  </script>
+</body>
+</html>
