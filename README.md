@@ -9,9 +9,8 @@ Generate high-quality AI images using Google's Gemini API via a sleek web interf
 - Gemini-powered image generation (`imagen-3.0-generate-002`)
 - Signed URL-based image access via Google Cloud Storage
 - Clean Bootstrap 5 UI
-- Rate-limited API using Flask-Limiter (default: `5 requests/min/IP`)
+- Rate-limited API using Flask-Limiter (default: `10 requests/min/IP`)
 - Environment-based secret management
-- Ready for production with Gunicorn + optional Celery (async)
 
 ---
 
